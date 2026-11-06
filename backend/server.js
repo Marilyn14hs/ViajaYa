@@ -1367,7 +1367,13 @@ app.patch(
     }
 );
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`Servidor de ViajaYa funcionando en el puerto ${PORT}`);
-});
+
+// Iniciar servidor solamente cuando se ejecuta directamente
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Servidor de ViajaYa funcionando en el puerto ${PORT}`);
+    });
+}
+
+// Permitir que las pruebas utilicen las rutas de Express
+module.exports = app;
