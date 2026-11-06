@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css'
+const API_URL = import.meta.env.VITE_API_URL || 'https://viajaya-backend.onrender.com';
 
 function App() {
   const [destinos, setDestinos] = useState([]);
@@ -49,7 +50,7 @@ function App() {
   useEffect(() => {
     async function cargarDestinos() {
       try {
-        const respuesta = await fetch('https://viajaya-backend.onrender.com/api/destinos');
+        const respuesta = await fetch(`${API_URL}/api/destinos`);
 
         if (!respuesta.ok) {
           throw new Error('No se pudieron cargar los destinos');
@@ -139,8 +140,8 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/destinos/disponibles?fecha=${encodeURIComponent(fecha)}&personas=${personas}`
-);
+        `${API_URL}/api/destinos/disponibles?fecha=${encodeURIComponent(fecha)}&personas=${personas}`
+      );
       if (!respuesta.ok) {
         const error = await respuesta.json();
         throw new Error(error.mensaje || 'No se pudo realizar la búsqueda');
@@ -170,7 +171,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/cotizaciones',
+        `${API_URL}/api/cotizaciones`,
         {
           method: 'POST',
           headers: {
@@ -230,7 +231,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/reservaciones',
+        `${API_URL}/api/reservaciones`,
         {
           method: 'POST',
           headers: {
@@ -282,7 +283,7 @@ function App() {
       });
 
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/reservaciones/consultar?${parametros}`
+        `${API_URL}/api/reservaciones/consultar?${parametros}`
       );
 
       const datos = await respuesta.json();
@@ -317,7 +318,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/reservaciones/cambiar-fecha',
+        `${API_URL}/api/reservaciones/cambiar-fecha`,
         {
           method: 'PATCH',
           headers: {
@@ -380,7 +381,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/reservaciones/cancelar',
+        `${API_URL}/api/reservaciones/cancelar`,
         {
           method: 'PATCH',
           headers: {
@@ -438,7 +439,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/admin/login',
+        `${API_URL}/api/admin/login`,
         {
           method: 'POST',
           headers: {
@@ -496,7 +497,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/admin/destinos',
+        '${API_URL}/api/admin/destinos',
         {
           method: 'GET',
           headers: {
@@ -532,7 +533,7 @@ function App() {
     setMensajeNuevoDestino('');
 
     try {
-      const respuesta = await fetch('https://viajaya-backend.onrender.com/api/admin/destinos', {
+      const respuesta = await fetch('${API_URL}/api/admin/destinos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -561,7 +562,7 @@ function App() {
       // Actualizar el panel y la página pública.
       await cargarDestinosAdmin(tokenAdmin);
       try {
-        const respuestaPublica = await fetch('https://viajaya-backend.onrender.com/api/destinos');
+        const respuestaPublica = await fetch('${API_URL}/api/destinos');
         if (respuestaPublica.ok) {
           setDestinos(await respuestaPublica.json());
           setBusquedaRealizada(false);
@@ -607,7 +608,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/admin/destinos/${destinoEditando.id}`,
+        `${API_URL}/api/admin/destinos/${destinoEditando.id}`,
         {
           method: 'PATCH',
           headers: {
@@ -636,7 +637,7 @@ function App() {
 
       // Actualizar los destinos de la página pública
       const respuestaPublica = await fetch(
-        'https://viajaya-backend.onrender.com/api/destinos'
+        '${API_URL}/api/destinos'
       );
 
       if (respuestaPublica.ok) {
@@ -671,7 +672,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/admin/destinos/${destino.id}/estado`,
+        `${API_URL}/api/admin/destinos/${destino.id}/estado`,
         {
           method: 'PATCH',
           headers: {
@@ -699,7 +700,7 @@ function App() {
 
       // Actualizar los destinos de la página pública
       const respuestaPublica = await fetch(
-        'https://viajaya-backend.onrender.com/api/destinos'
+        '${API_URL}/api/destinos'
       );
 
       if (respuestaPublica.ok) {
@@ -719,7 +720,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/admin/reservaciones',
+        '${API_URL}/api/admin/reservaciones',
         {
           headers: {
             Authorization: `Bearer ${tokenAdmin}`
@@ -762,7 +763,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/admin/reservaciones/${reservacion.id}/cancelar`,
+        `${API_URL}/api/admin/reservaciones/${reservacion.id}/cancelar`,
         {
           method: 'PATCH',
           headers: {
@@ -811,7 +812,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/admin/reservaciones/${reservacion.id}/eliminar`,
+        `${API_URL}/api/admin/reservaciones/${reservacion.id}/eliminar`,
         {
           method: 'PATCH',
           headers: {
@@ -859,7 +860,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/admin/reservaciones/${reservacion.id}/aprobar`,
+        `${API_URL}/api/admin/reservaciones/${reservacion.id}/aprobar`,
         {
           method: 'PATCH',
           headers: {
@@ -897,7 +898,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        'https://viajaya-backend.onrender.com/api/admin/pagos',
+        '${API_URL}/api/admin/pagos',
         {
           headers: {
             Authorization: `Bearer ${tokenAdmin}`
@@ -942,7 +943,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `https://viajaya-backend.onrender.com/api/admin/pagos/${pago.id}/estado`,
+        `${API_URL}/api/admin/pagos/${pago.id}/estado`,
         {
           method: 'PATCH',
           headers: {
