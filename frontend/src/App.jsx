@@ -497,7 +497,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        '${API_URL}/api/admin/destinos',
+        `${API_URL}/api/admin/destinos`,
         {
           method: 'GET',
           headers: {
@@ -533,7 +533,7 @@ function App() {
     setMensajeNuevoDestino('');
 
     try {
-      const respuesta = await fetch('${API_URL}/api/admin/destinos', {
+      const respuesta = await fetch(`${API_URL}/api/admin/destinos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -562,7 +562,7 @@ function App() {
       // Actualizar el panel y la página pública.
       await cargarDestinosAdmin(tokenAdmin);
       try {
-        const respuestaPublica = await fetch('${API_URL}/api/destinos');
+        fetch(`${API_URL}/api/destinos`);
         if (respuestaPublica.ok) {
           setDestinos(await respuestaPublica.json());
           setBusquedaRealizada(false);
@@ -637,7 +637,7 @@ function App() {
 
       // Actualizar los destinos de la página pública
       const respuestaPublica = await fetch(
-        '${API_URL}/api/destinos'
+        `${API_URL}/api/destinos`
       );
 
       if (respuestaPublica.ok) {
@@ -700,7 +700,7 @@ function App() {
 
       // Actualizar los destinos de la página pública
       const respuestaPublica = await fetch(
-        '${API_URL}/api/destinos'
+        `${API_URL}/api/destinos`
       );
 
       if (respuestaPublica.ok) {
@@ -720,7 +720,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        '${API_URL}/api/admin/reservaciones',
+        `${API_URL}/api/admin/reservaciones`,
         {
           headers: {
             Authorization: `Bearer ${tokenAdmin}`
@@ -898,7 +898,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        '${API_URL}/api/admin/pagos',
+        `${API_URL}/api/admin/pagos`,
         {
           headers: {
             Authorization: `Bearer ${tokenAdmin}`
