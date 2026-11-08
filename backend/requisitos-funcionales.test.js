@@ -2,8 +2,23 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+// Protección para las pruebas que utilizan PostgreSQL
+function verificarBaseDePruebas() {
+    if (
+        process.env.DB_HOST !== 'localhost' ||
+        process.env.DB_PORT !== '5433' ||
+        process.env.DB_NAME !== 'viajaya_prueba' ||
+        process.env.DB_SSL !== 'false'
+    ) {
+        throw new Error(
+            'SEGURIDAD: Las pruebas con base de datos solo pueden ejecutarse en viajaya_prueba local'
+        );
+    }
+}
+
 const {
-    crearReservacion
+    crearReservacion,
+    calcularTotal
 } = require('./services/reservacionesService');
 
 // Prueba funcional 1 - RF-03
@@ -150,7 +165,7 @@ test('RF-01: rechaza búsqueda con cantidad de personas inválida', async () => 
     );
 });
 
- // Prueba funcional 9 - RF-02
+// Prueba funcional 9 - RF-02
 test('RF-02: rechaza una cotización con cantidad de personas inválida', async () => {
     const servidor = app.listen(0);
 
@@ -192,5 +207,40 @@ test('RF-04: rechaza consultar una reservación sin código', async () => {
     assert.match(
         resultado.datos.mensaje,
         /Debes ingresar el código de confirmación/
+    );
+});
+
+// Prueba funcional 11 - RF-02: cotización exitosa
+test('RF-02: calcula correctamente una cotización', async () => {
+    verificarBaseDePruebas();
+
+    const pool = require('./database');
+
+    const resultado = await pool.query(
+        `SELECT id, precio_base
+         FROM destinos
+         WHERE activo = TRUE
+         LIMIT 1`
+    );
+
+    assert.ok(
+        resultado.rows.length > 0,
+        'Debe existir un destino activo en la base de pruebas'
+    );
+
+    const destino = resultado.rows[0];
+
+    const cotizacion = calcularTotal(
+        Number(destino.precio_base),
+        2
+    );
+
+    const subtotalEsperado = Number(destino.precio_base) * 2;
+
+    assert.equal(Number(cotizacion.subtotal), subtotalEsperado);
+    assert.equal(Number(cotizacion.iva), subtotalEsperado * 0.13);
+    assert.equal(
+        Number(cotizacion.total),
+        Number((subtotalEsperado * 1.13).toFixed(2))
     );
 });
