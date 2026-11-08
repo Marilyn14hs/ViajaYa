@@ -83,7 +83,7 @@ function App() {
     correo: '',
     fecha: '',
     hora: '08:00',
-    ultimoDigitoTarjeta: ''
+    numeroTarjeta: ''
   });
   const [procesandoReserva, setProcesandoReserva] = useState(false);
   const [errorReserva, setErrorReserva] = useState('');
@@ -213,7 +213,7 @@ function App() {
       correo: '',
       fecha: fecha || '',
       hora: '08:00',
-      ultimoDigitoTarjeta: ''
+      numeroTarjeta: ''
     });
 
     setMostrarFormularioReserva(true);
@@ -244,7 +244,7 @@ function App() {
             fecha: datosReserva.fecha,
             hora: datosReserva.hora,
             personas: cotizacion.personas,
-            ultimoDigitoTarjeta: datosReserva.ultimoDigitoTarjeta
+            ultimoDigitoTarjeta: Number(datosReserva.numeroTarjeta.slice(-1))
           })
         }
       );
@@ -1370,27 +1370,31 @@ function App() {
                 />
 
                 <label htmlFor="reserva-tarjeta">
-                  Último dígito de la tarjeta (pago simulado)
+                  Número de tarjeta (pago simulado)
                 </label>
-                <select
+                <input
                   id="reserva-tarjeta"
-                  value={datosReserva.ultimoDigitoTarjeta}
-                  onChange={(evento) =>
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="0000 0000 0000 0000"
+                  value={datosReserva.numeroTarjeta}
+                  onChange={(evento) => {
+                    const numero = evento.target.value
+                      .replace(/\D/g, '')
+                      .slice(0, 16);
+
                     setDatosReserva({
                       ...datosReserva,
-                      ultimoDigitoTarjeta: evento.target.value
-                    })
-                  }
+                      numeroTarjeta: numero
+                    });
+                  }}
+                  minLength={16}
+                  maxLength={16}
+                  pattern="[0-9]{16}"
+                  title="Introduce exactamente 16 dígitos de una tarjeta ficticia"
                   required
-                >
-                  <option value="">Selecciona un dígito</option>
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digito) => (
-                    <option key={digito} value={digito}>
-                      {digito}
-                    </option>
-                  ))}
-                </select>
-
+                />
                 <div className="reserva-resumen">
                   <p>
                     <strong>Personas:</strong> {cotizacion.personas}
@@ -2241,7 +2245,7 @@ function App() {
                   </p>
                 )}
 
-                {reservacionesAdmin.length === 0 &&
+                {reservacionesAdmin.filter((reservacion) => reservacion.eliminada !== true).length === 0 &&
                   !cargandoReservacionesAdmin &&
                   !errorReservacionesAdmin && (
                     <p>
@@ -2249,99 +2253,101 @@ function App() {
                     </p>
                   )}
 
-                {reservacionesAdmin.map((reservacion) => (
-                  <div
-                    key={reservacion.id}
-                    className="tarjeta-destino-admin"
-                  >
-                    <h4>🎫 {reservacion.codigo_confirmacion}</h4>
+                {reservacionesAdmin
+                  .filter((reservacion) => reservacion.eliminada !== true)
+                  .map((reservacion) => (
+                    <div
+                      key={reservacion.id}
+                      className="tarjeta-destino-admin"
+                    >
+                      <h4>🎫 {reservacion.codigo_confirmacion}</h4>
 
-                    <p>
-                      <strong>Cliente:</strong> {reservacion.nombre_cliente}
-                    </p>
+                      <p>
+                        <strong>Cliente:</strong> {reservacion.nombre_cliente}
+                      </p>
 
-                    <p>
-                      <strong>Correo:</strong> {reservacion.correo_cliente}
-                    </p>
+                      <p>
+                        <strong>Correo:</strong> {reservacion.correo_cliente}
+                      </p>
 
-                    <p>
-                      <strong>Destino:</strong> {reservacion.nombre_destino}
-                    </p>
+                      <p>
+                        <strong>Destino:</strong> {reservacion.nombre_destino}
+                      </p>
 
-                    <p>
-                      <strong>Fecha de excursión:</strong>{' '}
-                      {String(reservacion.fecha_excursion).slice(0, 10)}
-                    </p>
+                      <p>
+                        <strong>Fecha de excursión:</strong>{' '}
+                        {String(reservacion.fecha_excursion).slice(0, 10)}
+                      </p>
 
-                    <p>
-                      <strong>Hora:</strong> {reservacion.hora_excursion}
-                    </p>
+                      <p>
+                        <strong>Hora:</strong> {reservacion.hora_excursion}
+                      </p>
 
-                    <p>
-                      <strong>Personas:</strong> {reservacion.cantidad_personas}
-                    </p>
+                      <p>
+                        <strong>Personas:</strong> {reservacion.cantidad_personas}
+                      </p>
 
-                    <p>
-                      <strong>Total:</strong> ₡
-                      {Number(reservacion.total).toLocaleString('es-CR')}
-                    </p>
+                      <p>
+                        <strong>Total:</strong> ₡
+                        {Number(reservacion.total).toLocaleString('es-CR')}
+                      </p>
 
-                    <p>
-                      <strong>Estado de reservación:</strong> {reservacion.estado}
-                    </p>
+                      <p>
+                        <strong>Estado de reservación:</strong> {reservacion.estado}
+                      </p>
 
-                    <p>
-                      <strong>Estado de pago:</strong>{' '}
-                      {reservacion.estado_pago || 'Sin pago registrado'}
-                    </p>
+                      <p>
+                        <strong>Estado de pago:</strong>{' '}
+                        {reservacion.estado_pago || 'Sin pago registrado'}
+                      </p>
 
-                    <p>
-                      <strong>Eliminada:</strong>{' '}
-                      {reservacion.eliminada ? 'Sí' : 'No'}
-                    </p>
+                      <p>
+                        <strong>Eliminada:</strong>{' '}
+                        {reservacion.eliminada ? 'Sí' : 'No'}
+                      </p>
 
-                    {reservacion.estado === 'Confirmada' && !reservacion.eliminada && (
-                      <button
-                        type="button"
-                        className="boton-cancelar-reservacion"
-                        onClick={() => cancelarReservacionAdmin(reservacion)}
-                        disabled={cancelandoReservaAdmin !== null}
-                      >
-                        {cancelandoReservaAdmin === reservacion.id
-                          ? 'Cancelando reservación...'
-                          : 'Cancelar reservación'}
-                      </button>
-                    )}
-
-                    {reservacion.estado === 'Cancelada' && !reservacion.eliminada && (
-                      <button
-                        type="button"
-                        className="boton-cancelar-reservacion"
-                        onClick={() => eliminarReservacionAdmin(reservacion)}
-                        disabled={eliminandoReservaAdmin !== null}
-                      >
-                        {eliminandoReservaAdmin === reservacion.id
-                          ? 'Eliminando reservación...'
-                          : 'Eliminar reservación'}
-                      </button>
-                    )}
-
-                    {reservacion.estado === 'Pendiente' &&
-                      reservacion.estado_pago === 'Aprobado' &&
-                      !reservacion.eliminada && (
+                      {reservacion.estado === 'Confirmada' && !reservacion.eliminada && (
                         <button
                           type="button"
-                          className="boton-confirmar-cotizacion"
-                          onClick={() => aprobarReservacionAdmin(reservacion)}
-                          disabled={aprobandoReservaAdmin !== null}
+                          className="boton-cancelar-reservacion"
+                          onClick={() => cancelarReservacionAdmin(reservacion)}
+                          disabled={cancelandoReservaAdmin !== null}
                         >
-                          {aprobandoReservaAdmin === reservacion.id
-                            ? 'Aprobando reservación...'
-                            : '✅ Aprobar reservación'}
+                          {cancelandoReservaAdmin === reservacion.id
+                            ? 'Cancelando reservación...'
+                            : 'Cancelar reservación'}
                         </button>
                       )}
-                  </div>
-                ))}
+
+                      {reservacion.estado === 'Cancelada' && !reservacion.eliminada && (
+                        <button
+                          type="button"
+                          className="boton-cancelar-reservacion"
+                          onClick={() => eliminarReservacionAdmin(reservacion)}
+                          disabled={eliminandoReservaAdmin !== null}
+                        >
+                          {eliminandoReservaAdmin === reservacion.id
+                            ? 'Eliminando reservación...'
+                            : 'Eliminar reservación'}
+                        </button>
+                      )}
+
+                      {reservacion.estado === 'Pendiente' &&
+                        reservacion.estado_pago === 'Aprobado' &&
+                        !reservacion.eliminada && (
+                          <button
+                            type="button"
+                            className="boton-confirmar-cotizacion"
+                            onClick={() => aprobarReservacionAdmin(reservacion)}
+                            disabled={aprobandoReservaAdmin !== null}
+                          >
+                            {aprobandoReservaAdmin === reservacion.id
+                              ? 'Aprobando reservación...'
+                              : '✅ Aprobar reservación'}
+                          </button>
+                        )}
+                    </div>
+                  ))}
               </section>
             )}
 
