@@ -244,3 +244,134 @@ test('RF-02: calcula correctamente una cotización', async () => {
         Number((subtotalEsperado * 1.13).toFixed(2))
     );
 });
+
+// Prueba funcional 12 - RF-01: búsqueda exitosa
+test('RF-01: encuentra destinos disponibles para una fecha válida', async () => {
+    verificarBaseDePruebas();
+
+    const resultado = await probarRuta(
+        'GET',
+        '/api/destinos/disponibles?fecha=2027-12-15&personas=2'
+    );
+
+    assert.equal(resultado.estado, 200);
+    assert.ok(Array.isArray(resultado.datos));
+
+    assert.ok(
+        resultado.datos.length > 0,
+        'Debe existir al menos un destino disponible en la base de pruebas'
+    );
+
+    for (const destino of resultado.datos) {
+        assert.ok(Number(destino.espacios_disponibles) >= 2);
+    }
+});
+
+// Prueba funcional 13 - RF-03: creación exitosa
+test('RF-03: crea una reservación con pago aprobado', async () => {
+    verificarBaseDePruebas();
+
+    const pool = require('./database');
+    const correo = 'rf03-automatico@ejemplo.com';
+    let codigo = null;
+
+    try {
+        const resultado = await crearReservacion({
+            destino_id: 1,
+            nombre: 'Cliente Automatico',
+            correo,
+            fecha: '2027-12-15',
+            hora: '10:00',
+            personas: 2,
+            ultimoDigitoTarjeta: 8
+        });
+
+        codigo = resultado.codigo_confirmacion;
+
+        assert.ok(codigo);
+        assert.equal(resultado.estado_reservacion, 'Confirmada');
+        assert.equal(resultado.estado_pago, 'Aprobado');
+
+        const consulta = await pool.query(
+            `SELECT r.estado AS reserva, p.estado AS pago
+             FROM reservaciones r
+             INNER JOIN pagos p ON p.reservacion_id = r.id
+             WHERE r.codigo_confirmacion = $1`,
+            [codigo]
+        );
+
+        assert.equal(consulta.rows.length, 1);
+        assert.equal(consulta.rows[0].reserva, 'Confirmada');
+        assert.equal(consulta.rows[0].pago, 'Aprobado');
+
+    } finally {
+        // Eliminar únicamente la reservación creada por esta prueba
+        if (codigo) {
+            const reserva = await pool.query(
+                `SELECT id FROM reservaciones
+                 WHERE codigo_confirmacion = $1
+                   AND correo_cliente = $2`,
+                [codigo, correo]
+            );
+
+            if (reserva.rows.length === 1) {
+                const id = reserva.rows[0].id;
+
+                await pool.query(
+                    'DELETE FROM pagos WHERE reservacion_id = $1',
+                    [id]
+                );
+
+                await pool.query(
+                    'DELETE FROM reservaciones WHERE id = $1',
+                    [id]
+                );
+            }
+        }
+    }
+});
+
+// Prueba funcional 14 - RF-04: consulta exitosa de reservación
+test('RF-04: consulta correctamente una reservación existente', async () => {
+    verificarBaseDePruebas();
+
+    const pool = require('./database');
+
+    // Utilizar una reservación existente en la base local
+    const consulta = await pool.query(
+        `SELECT codigo_confirmacion, correo_cliente
+         FROM reservaciones
+         WHERE eliminada = FALSE
+         LIMIT 1`
+    );
+
+    assert.ok(
+        consulta.rows.length > 0,
+        'Debe existir una reservación en la base de pruebas'
+    );
+
+    const reserva = consulta.rows[0];
+
+    const ruta =
+        '/api/reservaciones/consultar?codigo=' +
+        encodeURIComponent(reserva.codigo_confirmacion) +
+        '&correo=' +
+        encodeURIComponent(reserva.correo_cliente);
+
+    const resultado = await probarRuta('GET', ruta);
+
+    assert.equal(resultado.estado, 200);
+
+    assert.equal(
+        resultado.datos.reservacion.codigo_confirmacion,
+        reserva.codigo_confirmacion
+    );
+
+    assert.equal(
+        resultado.datos.reservacion.correo_cliente,
+        reserva.correo_cliente
+    );
+
+    assert.ok(resultado.datos.reservacion.destino);
+    assert.ok(resultado.datos.reservacion.estado_pago);
+});
