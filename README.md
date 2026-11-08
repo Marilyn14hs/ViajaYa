@@ -101,6 +101,8 @@ DB_SSL=false
 PORT=3001
 NODE_ENV=development
 JWT_SECRETO=clave_secreta_de_desarrollo
+ADMIN_USUARIO=admin_prueba
+ADMIN_CLAVE=clave_temporal_local_2026
 ```
 
 Reemplazar los valores de ejemplo con los datos de la instalación correspondiente. La configuración de `DB_SSL` depende del servidor PostgreSQL utilizado.
