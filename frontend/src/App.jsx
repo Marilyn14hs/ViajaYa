@@ -1378,7 +1378,7 @@ function App() {
                   inputMode="numeric"
                   autoComplete="off"
                   placeholder="0000 0000 0000 0000"
-                  value={datosReserva.numeroTarjeta}
+                  value={datosReserva.numeroTarjeta.replace(/(\d{4})(?=\d)/g, '$1 ')}
                   onChange={(evento) => {
                     const numero = evento.target.value
                       .replace(/\D/g, '')
@@ -1390,8 +1390,8 @@ function App() {
                     });
                   }}
                   minLength={16}
-                  maxLength={16}
-                  pattern="[0-9]{16}"
+                  maxLength={19}
+                  pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
                   title="Introduce exactamente 16 dígitos de una tarjeta ficticia"
                   required
                 />
