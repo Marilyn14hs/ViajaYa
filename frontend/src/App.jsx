@@ -996,34 +996,36 @@ function App() {
             <a href="#nosotros">Nosotros</a>
           </nav>
 
-          <button
-            className="boton-reservas"
-            onClick={() => {
-              setMostrarConsulta(true);
-              setErrorConsulta('');
-              setReservaConsultada(null);
-            }}
-          >
-            Mis reservaciones
-          </button>
-          <button
-            type="button"
-            className="boton-administracion"
-            onClick={() => {
-              setErrorLoginAdmin('');
+          <div className="navbar-acciones">
+            <button
+              className="boton-reservas"
+              onClick={() => {
+                setMostrarConsulta(true);
+                setErrorConsulta('');
+                setReservaConsultada(null);
+              }}
+            >
+              Mis reservaciones
+            </button>
+            <button
+              type="button"
+              className="boton-reservas"
+              onClick={() => {
+                setErrorLoginAdmin('');
 
-              if (tokenAdmin) {
-                setMostrarPanelAdmin(true);
-                setPestanaAdmin('destinos');
-                cargarDestinosAdmin(tokenAdmin);
-              } else {
-                setMostrarLoginAdmin(true);
-              }
-            }}
-          >
-            Administración
-          </button>
-        </div>
+                if (tokenAdmin) {
+                  setMostrarPanelAdmin(true);
+                  setPestanaAdmin('destinos');
+                  cargarDestinosAdmin(tokenAdmin);
+                } else {
+                  setMostrarLoginAdmin(true);
+                }
+              }}
+            >
+              Administración
+            </button>
+          </div> {/* Cierra navbar-acciones */}
+        </div> {/* Cierra navbar-contenido */}
       </header>
 
       {/* PORTADA */}

@@ -2397,3 +2397,53 @@ body {
 .boton-destino:active:not(:disabled) {
   transform: translateY(0);
 }
+
+/* VIAJAYA - Alinear botones de las tarjetas */
+
+.destino-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.destino-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.destino-info .destino-precio {
+  margin-top: auto;
+}
+
+.destino-info .boton-destino {
+  margin-top: 18px;
+}
+
+/* Botones del menú superior */
+
+.navbar-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.navbar-acciones .boton-reservas {
+  min-width: 190px;
+  min-height: 52px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .navbar-acciones {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .navbar-acciones .boton-reservas {
+    min-width: auto;
+    min-height: 44px;
+  }
+}
