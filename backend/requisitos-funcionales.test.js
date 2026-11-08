@@ -18,7 +18,9 @@ function verificarBaseDePruebas() {
 
 const {
     crearReservacion,
-    calcularTotal
+    calcularTotal,
+    cambiarFechaReservacion,
+    cancelarReservacion
 } = require('./services/reservacionesService');
 
 // Prueba funcional 1 - RF-03
@@ -54,10 +56,6 @@ test('RF-03: rechaza una reservación con correo electrónico inválido', async 
 });
 
 
-const {
-    cambiarFechaReservacion
-} = require('./services/reservacionesService');
-
 // Prueba funcional 3 - RF-05
 test('RF-05: rechaza cambiar fecha sin código de confirmación', async () => {
     await assert.rejects(
@@ -81,10 +79,6 @@ test('RF-05: rechaza cambiar fecha con una fecha inválida', async () => {
         /La nueva fecha no es válida/
     );
 });
-
-const {
-    cancelarReservacion
-} = require('./services/reservacionesService');
 
 // Prueba funcional 5 - RF-06
 test('RF-06: rechaza cancelar una reservación sin código', async () => {
@@ -374,4 +368,183 @@ test('RF-04: consulta correctamente una reservación existente', async () => {
 
     assert.ok(resultado.datos.reservacion.destino);
     assert.ok(resultado.datos.reservacion.estado_pago);
+});
+
+// Prueba funcional 15 - RF-05: cambio exitoso de fecha
+test('RF-05: cambia correctamente la fecha de una reservación', async () => {
+    verificarBaseDePruebas();
+
+    const pool = require('./database');
+    const correo = 'rf05-automatico@ejemplo.com';
+    let codigo = null;
+
+    try {
+        // Crear una reservación exclusiva para esta prueba
+        const reserva = await crearReservacion({
+            destino_id: 1,
+            nombre: 'Cliente Prueba RF05',
+            correo,
+            fecha: '2027-11-15',
+            hora: '10:00',
+            personas: 1,
+            ultimoDigitoTarjeta: 8
+        });
+
+        codigo = reserva.codigo_confirmacion;
+
+        // Cambiar la fecha de la excursión
+        const cambio = await cambiarFechaReservacion({
+            codigo,
+            correo,
+            nuevaFecha: '2027-11-20'
+        });
+
+        assert.equal(cambio.codigo_confirmacion, codigo);
+        assert.equal(cambio.fecha_anterior, '2027-11-15');
+        assert.equal(cambio.fecha_nueva, '2027-11-20');
+        assert.equal(cambio.estado, 'Confirmada');
+
+        // Comprobar que PostgreSQL guardó la nueva fecha
+        const consulta = await pool.query(
+            `SELECT fecha_excursion::TEXT AS fecha
+             FROM reservaciones
+             WHERE codigo_confirmacion = $1
+               AND correo_cliente = $2`,
+            [codigo, correo]
+        );
+
+        assert.equal(consulta.rows.length, 1);
+        assert.equal(consulta.rows[0].fecha, '2027-11-20');
+
+    } finally {
+        // Limpiar solamente los registros creados por esta prueba
+        if (codigo) {
+            verificarBaseDePruebas();
+
+            const cliente = await pool.connect();
+
+            try {
+                await cliente.query('BEGIN');
+
+                const resultado = await cliente.query(
+                    `SELECT id FROM reservaciones
+                     WHERE codigo_confirmacion = $1
+                       AND correo_cliente = $2
+                     FOR UPDATE`,
+                    [codigo, correo]
+                );
+
+                if (resultado.rows.length === 1) {
+                    const id = resultado.rows[0].id;
+
+                    await cliente.query(
+                        'DELETE FROM pagos WHERE reservacion_id = $1',
+                        [id]
+                    );
+
+                    await cliente.query(
+                        'DELETE FROM reservaciones WHERE id = $1',
+                        [id]
+                    );
+                }
+
+                await cliente.query('COMMIT');
+            } catch (error) {
+                await cliente.query('ROLLBACK');
+                throw error;
+            } finally {
+                cliente.release();
+            }
+        }
+    }
+});
+
+// Prueba funcional 16 - RF-06: cancelación exitosa
+test('RF-06: cancela correctamente una reservación confirmada', async () => {
+    verificarBaseDePruebas();
+
+    const pool = require('./database');
+    const correo = 'rf06-automatico@ejemplo.com';
+    let codigo = null;
+
+    try {
+        // Crear una reservación exclusiva para esta prueba
+        const reserva = await crearReservacion({
+            destino_id: 1,
+            nombre: 'Cliente Prueba RF06',
+            correo,
+            fecha: '2027-12-10',
+            hora: '10:00',
+            personas: 1,
+            ultimoDigitoTarjeta: 8
+        });
+
+        codigo = reserva.codigo_confirmacion;
+
+        assert.equal(reserva.estado_reservacion, 'Confirmada');
+        assert.equal(reserva.estado_pago, 'Aprobado');
+
+        // Cancelar la reservación
+        const cancelacion = await cancelarReservacion({
+            codigo,
+            correo
+        });
+
+        assert.equal(cancelacion.codigo_confirmacion, codigo);
+        assert.equal(cancelacion.estado, 'Cancelada');
+
+        // Comprobar que PostgreSQL guardó la cancelación
+        const consulta = await pool.query(
+            `SELECT estado
+             FROM reservaciones
+             WHERE codigo_confirmacion = $1
+               AND correo_cliente = $2`,
+            [codigo, correo]
+        );
+
+        assert.equal(consulta.rows.length, 1);
+        assert.equal(consulta.rows[0].estado, 'Cancelada');
+
+    } finally {
+        // Eliminar únicamente los registros de esta prueba
+        if (codigo) {
+            verificarBaseDePruebas();
+
+            const cliente = await pool.connect();
+
+            try {
+                await cliente.query('BEGIN');
+
+                const resultado = await cliente.query(
+                    `SELECT id
+                     FROM reservaciones
+                     WHERE codigo_confirmacion = $1
+                       AND correo_cliente = $2
+                     FOR UPDATE`,
+                    [codigo, correo]
+                );
+
+                if (resultado.rows.length === 1) {
+                    const id = resultado.rows[0].id;
+
+                    await cliente.query(
+                        'DELETE FROM pagos WHERE reservacion_id = $1',
+                        [id]
+                    );
+
+                    await cliente.query(
+                        'DELETE FROM reservaciones WHERE id = $1',
+                        [id]
+                    );
+                }
+
+                await cliente.query('COMMIT');
+            } catch (error) {
+                await cliente.query('ROLLBACK');
+                throw error;
+            } finally {
+                cliente.release();
+            }
+        }
+    }
 });
