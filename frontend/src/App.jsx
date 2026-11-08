@@ -1168,17 +1168,27 @@ function App() {
 
                 <p>{destino.descripcion}</p>
                 {busquedaRealizada && destino.espacios_disponibles !== undefined && (
-                  <p>
-                    🟢 {destino.espacios_disponibles} espacios disponibles
-                  </p>
+                  <div className="destino-disponibilidad">
+                    <span className="destino-disponibilidad-punto"></span>
+                    <span>
+                      {destino.espacios_disponibles} espacios disponibles
+                    </span>
+                  </div>
                 )}
 
-                <p>
-                  <strong>
-                    Desde ₡{Number(destino.precio_base).toLocaleString('es-CR')}
-                  </strong>
-                  {' '}por persona
-                </p>
+                <div className="destino-precio">
+                  <span className="destino-precio-etiqueta">
+                    DESDE
+                  </span>
+
+                  <div className="destino-precio-fila">
+                    <strong>
+                      ₡{Number(destino.precio_base).toLocaleString('es-CR')}
+                    </strong>
+
+                    <span> / por persona</span>
+                  </div>
+                </div>
 
                 <button
                   className="boton-destino"

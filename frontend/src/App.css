@@ -2315,3 +2315,85 @@ body {
     max-width: 100%;
   }
 }
+
+/* Precio destacado en las tarjetas de destinos */
+
+.destino-precio {
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: #f0f9f4;
+  border: 1px solid #dcefe3;
+  border-radius: 12px;
+}
+
+.destino-precio-etiqueta {
+  display: block;
+  color: #527b63;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 5px;
+}
+
+.destino-precio-fila {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.destino-precio-fila strong {
+  color: #176b43;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.destino-precio-fila span {
+  color: #65756c;
+  font-size: 13px;
+}
+
+.destino-precio-fila strong {
+  color: #176b43;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+/* Etiqueta de disponibilidad de destinos */
+
+.destino-disponibilidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 8px 12px;
+  background: #eaf8ef;
+  border: 1px solid #ccebd7;
+  border-radius: 20px;
+  color: #176b43;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.destino-disponibilidad-punto {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  background: #22a65a;
+  border-radius: 50%;
+}
+
+/* Efecto moderno del botón de destinos */
+
+.boton-destino {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.boton-destino:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 110, 75, 0.22);
+}
+
+.boton-destino:active:not(:disabled) {
+  transform: translateY(0);
+}
