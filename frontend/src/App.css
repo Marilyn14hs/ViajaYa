@@ -2447,3 +2447,381 @@ body {
     min-height: 44px;
   }
 }
+
+/* Logo grande de ViajaYa */
+.logo-imagen {
+  width: 140px;
+  height: 110px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Acercar el logo al nombre ViajaYa */
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  letter-spacing: -1px;
+}
+
+/* Mantener el logo grande y acercarlo al texto */
+.logo-imagen {
+  width: 140px;
+  height: 110px;
+  object-fit: contain;
+  margin-right: -20px;
+  flex-shrink: 0;
+}
+
+/* Juntar Viaja y Ya */
+.navbar .logo span {
+  margin-left: 0;
+  padding-left: 0;
+  letter-spacing: -1px;
+}
+
+/* Ícono de búsqueda de ViajaYa */
+.buscador-icono {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e8f5ee;
+  color: #047857;
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.buscador-icono svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Menú de navegación moderno */
+.navbar .menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar .menu a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #176b46;
+  background: transparent;
+  transition: all 0.25s ease;
+}
+
+/* Efecto al pasar el cursor */
+.navbar .menu a:hover {
+  background: #e8f5ee;
+  color: #047857;
+  transform: translateY(-2px);
+}
+
+/* Botón de la sección seleccionada */
+.navbar .menu a.activo {
+  background: #047857;
+  color: white;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.2);
+}
+
+/* SECCIÓN SOBRE NOSOTROS */
+.nosotros {
+  padding: 45px 8% 80px;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff, #f0f9f4);
+  min-height: 70vh;
+}
+
+.nosotros h2 {
+  font-size: clamp(28px, 4vw, 42px);
+  color: #174d38;
+  margin: 18px 0 25px;
+}
+
+.nosotros-introduccion {
+  max-width: 850px;
+  margin: 0 auto 18px;
+  font-size: 17px;
+  line-height: 1.8;
+  color: #52665b;
+}
+
+/* CONTENEDOR DE TARJETAS */
+.nosotros-contenido {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 50px auto 0;
+}
+
+/* TARJETAS */
+.nosotros-tarjeta {
+  background: #ffffff;
+  padding: 35px 28px;
+  border-radius: 20px;
+  border: 1px solid #dcefe3;
+  box-shadow: 0 8px 25px rgba(0, 80, 45, 0.07);
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nosotros-tarjeta:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 15px 35px rgba(0, 80, 45, 0.13);
+}
+
+.nosotros-tarjeta h3 {
+  font-size: 22px;
+  color: #087f5b;
+  margin-bottom: 18px;
+}
+
+.nosotros-tarjeta p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #52665b;
+}
+
+/* ADAPTACIÓN PARA CELULARES */
+@media (max-width: 900px) {
+  .nosotros-contenido {
+    grid-template-columns: 1fr;
+    max-width: 550px;
+  }
+
+  .nosotros {
+    padding: 65px 6%;
+  }
+
+  .nosotros-tarjeta {
+    padding: 28px;
+  }
+}
+
+/* Centrar el encabezado de Nosotros */
+.nosotros>h2 {
+  width: 100%;
+  max-width: 900px;
+  margin: 18px auto 25px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.nosotros>.seccion-etiqueta {
+  display: block;
+  text-align: center;
+}
+
+/* Fondo degradado de ViajaYa */
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #f0f9f4 45%,
+      #dcefe4 100%);
+}
+
+/* Fondo degradado de Nosotros */
+.nosotros {
+  background: linear-gradient(180deg,
+      #ffffff 0%,
+      #f0f9f4 55%,
+      #dcefe4 100%);
+}
+
+/* Menú: solamente letras amarillas */
+.navbar .menu a,
+.navbar .menu a.activo {
+  color: #ffbd59;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+/* Rectángulo visible solamente al pasar el mouse */
+.navbar .menu a:hover,
+.navbar .menu a.activo:hover {
+  color: #174d38;
+  background: rgba(255, 189, 89, 0.25);
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+/* Fondo degradado de la sección Nosotros */
+.nosotros {
+  background: linear-gradient(160deg,
+      #e2f5e9 0%,
+      #f7fcf8 35%,
+      #fffdf4 65%,
+      #fff0bc 100%);
+}
+
+/* Mantener las tarjetas blancas */
+.nosotros-tarjeta {
+  background: #ffffff;
+}
+
+/* Mantener el título centrado */
+.nosotros>h2 {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Unificar todos los botones del encabezado */
+.navbar .menu a,
+.navbar .menu a.activo,
+.navbar .navbar-acciones .boton-reservas {
+  color: #ffbd59;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Efecto al pasar el mouse */
+.navbar .menu a:hover,
+.navbar .menu a.activo:hover,
+.navbar .navbar-acciones .boton-reservas:hover {
+  color: #174d38;
+  background: rgba(255, 189, 89, 0.25);
+  border: none;
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+/* Menú elegante de ViajaYa */
+.navbar .menu a,
+.navbar .navbar-acciones .boton-reservas {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+  padding: 12px 20px;
+
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+
+  color: #174d38;
+  background: #ffffff;
+
+  border: 1px solid #e8dfc9;
+  border-radius: 12px;
+
+  box-shadow: 0 2px 6px rgba(0, 60, 35, 0.04);
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+/* Sección seleccionada */
+.navbar .menu a.activo {
+  background: #fff0c7;
+  color: #174d38;
+  border: 1px solid #ffbd59;
+  box-shadow: none;
+}
+
+/* Efecto al pasar el mouse */
+.navbar .menu a:hover,
+.navbar .menu a.activo:hover,
+.navbar .navbar-acciones .boton-reservas:hover {
+  background: #fff4d8;
+  color: #174d38;
+  border-color: #ffbd59;
+  box-shadow: 0 4px 12px rgba(255, 189, 89, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Separación uniforme */
+.navbar .menu,
+.navbar .navbar-acciones {
+  gap: 10px;
+}/* Alineación uniforme de tarjetas */
+.destinos-grid {
+  align-items: stretch;
+}
+
+.destino-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.destino-info {
+  display: grid;
+  grid-template-rows:
+    auto
+    minmax(55px, auto)
+    minmax(140px, 1fr)
+    auto
+    auto
+    auto;
+  gap: 14px;
+  flex: 1;
+  padding: 24px;
+}
+
+/* Nombre del destino */
+.destino-info h3 {
+  margin: 0;
+}
+
+/* Descripción: mismo espacio visual */
+.destino-info > p {
+  margin: 0;
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+}
+
+/* Capacidad */
+.destino-disponibilidad {
+  margin: 0;
+}
+
+/* Precio */
+.destino-precio {
+  margin: 0;
+}
+
+/* Botón */
+.destino-info .boton-destino {
+  width: 100%;
+  margin: 0;
+  align-self: end;
+}

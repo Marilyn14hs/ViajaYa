@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
 import './App.css'
+import logoViajaYa from './assets/logo-viajaya.jpeg';
 const API_URL = import.meta.env.VITE_API_URL || 'https://viajaya-backend.onrender.com';
 
 function App() {
+  const [seccionActual, setSeccionActual] = useState('inicio');
   const [destinos, setDestinos] = useState([]);
+  const [fechaDisponibilidad, setFechaDisponibilidad] = useState(() => {
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+
+    return `${anio}-${mes}-${dia}`;
+  });
   const [cargando, setCargando] = useState(true);
   const [errorDestinos, setErrorDestinos] = useState('');
 
@@ -50,7 +60,9 @@ function App() {
   useEffect(() => {
     async function cargarDestinos() {
       try {
-        const respuesta = await fetch(`${API_URL}/api/destinos`);
+        const respuesta = await fetch(
+          `${API_URL}/api/destinos/disponibles?fecha=${encodeURIComponent(fechaDisponibilidad)}&personas=1`
+        );
 
         if (!respuesta.ok) {
           throw new Error('No se pudieron cargar los destinos');
@@ -68,7 +80,7 @@ function App() {
     }
 
     cargarDestinos();
-  }, []);
+  }, [fechaDisponibilidad]);
   const [fecha, setFecha] = useState('')
   const [personas, setPersonas] = useState(2)
   const [busquedaRealizada, setBusquedaRealizada] = useState(false);
@@ -985,17 +997,40 @@ function App() {
       {/* MENÚ PRINCIPAL */}
       <header className="navbar">
         <div className="navbar-contenido">
-          <a href="#" className="logo">
-            <span className="logo-icono">✈</span>
+          <a href="#inicio" className="logo">
+            <img
+              src={logoViajaYa}
+              alt="Logo de ViajaYa"
+              className="logo-imagen"
+            />
             Viaja<span>Ya</span>
           </a>
 
           <nav className="menu">
-            <a href="#inicio">Inicio</a>
-            <a href="#destinos">Destinos</a>
-            <a href="#nosotros">Nosotros</a>
-          </nav>
+            <a
+              href="#inicio"
+              className={seccionActual === 'inicio' ? 'activo' : ''}
+              onClick={() => setSeccionActual('inicio')}
+            >
+              Inicio
+            </a>
 
+            <a
+              href="#destinos"
+              className={seccionActual === 'destinos' ? 'activo' : ''}
+              onClick={() => setSeccionActual('destinos')}
+            >
+              Destinos
+            </a>
+
+            <a
+              href="#nosotros"
+              className={seccionActual === 'nosotros' ? 'activo' : ''}
+              onClick={() => setSeccionActual('nosotros')}
+            >
+              Nosotros
+            </a>
+          </nav>
           <div className="navbar-acciones">
             <button
               className="boton-reservas"
@@ -1029,513 +1064,580 @@ function App() {
       </header>
 
       {/* PORTADA */}
-      <section className="hero" id="inicio">
-        <div className="hero-contenido">
-          <div className="etiqueta">
-            🌿 DESCUBRE COSTA RICA
-          </div>
-
-          <h1>
-            Tu próxima aventura
-            <br />
-            <span>comienza aquí.</span>
-          </h1>
-
-          <p className="hero-descripcion">
-            Explora destinos increíbles, vive experiencias
-            inolvidables y reserva tu próxima aventura
-            de manera fácil y segura.
-          </p>
-
-          <a href="#destinos" className="boton-explorar">
-            Explorar destinos →
-          </a>
-        </div>
-      </section>
-
-      {/* BUSCADOR */}
-      <section className="buscador-seccion">
-        <form className="buscador" onSubmit={buscarDestinos}>
-          <div className="buscador-titulo">
-            <span>🌎</span>
-            <div>
-              <h2>Encuentra tu próxima experiencia</h2>
-              <p>¿Cuándo quieres viajar?</p>
-            </div>
-          </div>
-
-          <div className="buscador-campos">
-            <div className="campo">
-              <label htmlFor="fecha">Fecha del viaje</label>
-              <input
-                id="fecha"
-                type="date"
-                value={fecha}
-                min={new Date().toLocaleDateString('en-CA')}
-                onChange={(e) => setFecha(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="campo">
-              <label htmlFor="personas">Personas</label>
-              <select
-                id="personas"
-                value={personas}
-                onChange={(e) => setPersonas(Number(e.target.value))}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((numero) => (
-                  <option key={numero} value={numero}>
-                    {numero} {numero === 1 ? 'persona' : 'personas'}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="boton-buscar"
-              disabled={buscando}
-            >
-              {buscando ? 'Buscando aventuras...' : 'Buscar aventuras →'}
-            </button>
-          </div>
-        </form>
-      </section>
-
-      {/* DESTINOS */}
-      <section className="destinos-seccion" id="destinos">
-        <div className="seccion-encabezado">
-          <span className="seccion-etiqueta">
-            EXPERIENCIAS INOLVIDABLES
-          </span>
-
-          <h2>
-            {busquedaRealizada
-              ? 'Experiencias disponibles para tu viaje'
-              : 'Destinos que te enamorarán'}
-          </h2>
-
-          <p>
-            {busquedaRealizada
-              ? `Resultados para ${personas} persona(s) el ${fecha}`
-              : 'Descubre algunos de los lugares más hermosos de Costa Rica.'}
-          </p>
-        </div>
-
-        <div className="destinos-grid">
-
-          {cargando && (
-            <p>Cargando destinos turísticos...</p>
-          )}
-
-          {errorDestinos && (
-            <p>{errorDestinos}</p>
-          )}
-
-          {!cargando && !errorDestinos && destinos.length === 0 && (
-            <p>No hay destinos disponibles en este momento.</p>
-          )}
-
-          {!cargando && !errorDestinos && destinos.map((destino) => (
-            <article className="destino-card" key={destino.id}>
-
-              <div
-                className={`destino-imagen ${destino.nombre.includes('Arenal')
-                  ? 'destino-arenal'
-                  : destino.nombre.includes('Manuel Antonio')
-                    ? 'destino-manuel'
-                    : destino.nombre.includes('Monteverde')
-                      ? 'destino-monteverde'
-                      : ''
-                  }`}
-                style={
-                  destino.imagen_url
-                    ? { backgroundImage: `url("${destino.imagen_url}")` }
-                    : undefined
-                }
-              >
-                <span className="destino-badge">
-                  🌿 Costa Rica
-                </span>
+      {seccionActual === 'inicio' && (
+        <>
+          <section className="hero" id="inicio">
+            <div className="hero-contenido">
+              <div className="etiqueta">
+                DESCUBRE COSTA RICA
               </div>
 
-              <div className="destino-info">
+              <h1>
+                Tu próxima aventura
+                <br />
+                <span>comienza aquí.</span>
+              </h1>
 
-                <span className="destino-ubicacion">
-                  📍 {destino.ubicacion}
-                </span>
-
-                <h3>{destino.nombre}</h3>
-
-                <p>{destino.descripcion}</p>
-                {busquedaRealizada && destino.espacios_disponibles !== undefined && (
-                  <div className="destino-disponibilidad">
-                    <span className="destino-disponibilidad-punto"></span>
-                    <span>
-                      {destino.espacios_disponibles} espacios disponibles
-                    </span>
-                  </div>
-                )}
-
-                <div className="destino-precio">
-                  <span className="destino-precio-etiqueta">
-                    DESDE
-                  </span>
-
-                  <div className="destino-precio-fila">
-                    <strong>
-                      ₡{Number(destino.precio_base).toLocaleString('es-CR')}
-                    </strong>
-
-                    <span> / por persona</span>
-                  </div>
-                </div>
-
-                <button
-                  className="boton-destino"
-                  onClick={() => cotizarDestino(destino)}
-                  disabled={cotizando}
-                >
-                  {cotizando ? 'Calculando...' : 'Ver experiencia →'}
-                </button>
-              </div>
-
-            </article>
-          ))}
-
-        </div>
-        {errorCotizacion && (
-          <div className="cotizacion-error">
-            <p>{errorCotizacion}</p>
-            <button onClick={cerrarCotizacion}>Cerrar</button>
-          </div>
-        )}
-
-        {cotizacion && !mostrarFormularioReserva && !resultadoReserva && (
-          <div className="modal-fondo" onClick={cerrarCotizacion}>
-            <div
-              className="modal-cotizacion"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="titulo-cotizacion"
-              onClick={(evento) => evento.stopPropagation()}
-            >
-              <button
-                className="modal-cerrar"
-                onClick={cerrarCotizacion}
-                aria-label="Cerrar cotización"
-              >
-                ×
-              </button>
-
-              <span className="seccion-etiqueta">
-                TU PRÓXIMA AVENTURA
-              </span>
-
-              <h2 id="titulo-cotizacion">Cotización de tu experiencia</h2>
-
-              <h3>{cotizacion.destino}</h3>
-
-              <div className="cotizacion-detalles">
-                <div>
-                  <span>Personas</span>
-                  <strong>{cotizacion.personas}</strong>
-                </div>
-
-                <div>
-                  <span>Precio por persona</span>
-                  <strong>
-                    ₡{Number(cotizacion.precio_unitario).toLocaleString('es-CR')}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>Subtotal</span>
-                  <strong>
-                    ₡{Number(cotizacion.subtotal).toLocaleString('es-CR')}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>IVA (13 %)</span>
-                  <strong>
-                    ₡{Number(cotizacion.iva).toLocaleString('es-CR')}
-                  </strong>
-                </div>
-
-                <div className="cotizacion-total">
-                  <span>Total</span>
-                  <strong>
-                    ₡{Number(cotizacion.total).toLocaleString('es-CR')}
-                  </strong>
-                </div>
-              </div>
-
-              <p className="cotizacion-aviso">
-                Esta cotización es informativa y todavía no constituye una reservación.
+              <p className="hero-descripcion">
+                Explora destinos increíbles, vive experiencias
+                inolvidables y reserva tu próxima aventura
+                de manera fácil y segura.
               </p>
 
-              <button
-                className="boton-confirmar-cotizacion"
-                onClick={abrirFormularioReserva}
-              >
-                Continuar con la reservación →
-              </button>
+
             </div>
-          </div>
-        )}
-        {mostrarFormularioReserva && cotizacion && (
-          <div className="modal-fondo">
-            <div
-              className="modal-cotizacion"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="titulo-reserva"
-            >
-              <button
-                type="button"
-                className="modal-cerrar"
-                onClick={() => setMostrarFormularioReserva(false)}
-                aria-label="Cerrar formulario"
-              >
-                ×
-              </button>
+          </section>
 
-              <span className="seccion-etiqueta">
-                ESTÁS A UN PASO DE TU AVENTURA
-              </span>
+          {/* BUSCADOR */}
+          <section className="buscador-seccion">
+            <form className="buscador" onSubmit={buscarDestinos}>
+              <div className="buscador-titulo">
+                <span className="buscador-icono">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                  </svg>
+                </span>
+                <div>
+                  <h2>Encuentra tu próxima experiencia</h2>
+                  <p>¿Cuándo quieres viajar?</p>
+                </div>
+              </div>
 
-              <h2 id="titulo-reserva">Datos de tu reservación</h2>
-
-              <h3>{cotizacion.destino}</h3>
-
-              <form
-                className="formulario-reserva"
-                onSubmit={confirmarReservacion}
-              >
-                <label htmlFor="reserva-nombre">
-                  Nombre completo
-                </label>
-                <input
-                  id="reserva-nombre"
-                  type="text"
-                  value={datosReserva.nombre}
-                  onChange={(evento) =>
-                    setDatosReserva({
-                      ...datosReserva,
-                      nombre: evento.target.value
-                    })
-                  }
-                  placeholder="Escribe tu nombre completo"
-                  required
-                />
-
-                <label htmlFor="reserva-correo">
-                  Correo electrónico
-                </label>
-                <input
-                  id="reserva-correo"
-                  type="email"
-                  value={datosReserva.correo}
-                  onChange={(evento) =>
-                    setDatosReserva({
-                      ...datosReserva,
-                      correo: evento.target.value
-                    })
-                  }
-                  placeholder="ejemplo@correo.com"
-                  required
-                />
-
-                <label htmlFor="reserva-fecha">
-                  Fecha de la excursión
-                </label>
-                <input
-                  id="reserva-fecha"
-                  type="date"
-                  value={datosReserva.fecha}
-                  min={new Date().toLocaleDateString('en-CA')}
-                  onChange={(evento) =>
-                    setDatosReserva({
-                      ...datosReserva,
-                      fecha: evento.target.value
-                    })
-                  }
-                  required
-                />
-
-                <label htmlFor="reserva-hora">
-                  Hora de la excursión
-                </label>
-                <input
-                  id="reserva-hora"
-                  type="time"
-                  value={datosReserva.hora}
-                  onChange={(evento) =>
-                    setDatosReserva({
-                      ...datosReserva,
-                      hora: evento.target.value
-                    })
-                  }
-                  required
-                />
-
-                <label htmlFor="reserva-tarjeta">
-                  Número de tarjeta (pago simulado)
-                </label>
-                <input
-                  id="reserva-tarjeta"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  placeholder="0000 0000 0000 0000"
-                  value={datosReserva.numeroTarjeta.replace(/(\d{4})(?=\d)/g, '$1 ')}
-                  onChange={(evento) => {
-                    const numero = evento.target.value
-                      .replace(/\D/g, '')
-                      .slice(0, 16);
-
-                    setDatosReserva({
-                      ...datosReserva,
-                      numeroTarjeta: numero
-                    });
-                  }}
-                  minLength={16}
-                  maxLength={19}
-                  pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
-                  title="Introduce exactamente 16 dígitos de una tarjeta ficticia"
-                  required
-                />
-                <div className="reserva-resumen">
-                  <p>
-                    <strong>Personas:</strong> {cotizacion.personas}
-                  </p>
-
-                  <p>
-                    <strong>Total con IVA:</strong>{' '}
-                    ₡{Number(cotizacion.total).toLocaleString('es-CR')}
-                  </p>
+              <div className="buscador-campos">
+                <div className="campo">
+                  <label htmlFor="fecha">Fecha del viaje</label>
+                  <input
+                    id="fecha"
+                    type="date"
+                    value={fecha}
+                    min={new Date().toLocaleDateString('en-CA')}
+                    onChange={(e) => setFecha(e.target.value)}
+                    required
+                  />
                 </div>
 
-                {errorReserva && (
-                  <p role="alert" style={{ color: '#b91c1c' }}>
-                    {errorReserva}
-                  </p>
-                )}
+                <div className="campo">
+                  <label htmlFor="personas">Personas</label>
+                  <select
+                    id="personas"
+                    value={personas}
+                    onChange={(e) => setPersonas(Number(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((numero) => (
+                      <option key={numero} value={numero}>
+                        {numero} {numero === 1 ? 'persona' : 'personas'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <button
                   type="submit"
-                  className="boton-confirmar-cotizacion"
-                  disabled={procesandoReserva}
+                  className="boton-buscar"
+                  disabled={buscando}
                 >
-                  {procesandoReserva
-                    ? 'Procesando reservación...'
-                    : 'Confirmar reservación →'}
+                  {buscando ? 'Buscando aventuras...' : 'Buscar aventuras →'}
                 </button>
-              </form>
-            </div>
-          </div>
-        )}
-        {resultadoReserva && (
-          <div className="modal-fondo">
-            <div
-              className="modal-cotizacion"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="titulo-resultado-reserva"
-            >
-              <span className="seccion-etiqueta">
-                VIAJAYA
-              </span>
-
-              <h2 id="titulo-resultado-reserva">
-                {resultadoReserva.estado_pago === 'Aprobado'
-                  ? '¡Reservación confirmada!'
-                  : 'Pago rechazado'}
-              </h2>
-
-              <h3>{resultadoReserva.destino}</h3>
-
-              <div className="cotizacion-detalles">
-                <div>
-                  <span>Fecha</span>
-                  <strong>{resultadoReserva.fecha}</strong>
-                </div>
-
-                <div>
-                  <span>Hora</span>
-                  <strong>{resultadoReserva.hora}</strong>
-                </div>
-
-                <div>
-                  <span>Personas</span>
-                  <strong>{resultadoReserva.personas}</strong>
-                </div>
-
-                <div>
-                  <span>Estado del pago</span>
-                  <strong>{resultadoReserva.estado_pago}</strong>
-                </div>
-
-                <div>
-                  <span>Estado de la reservación</span>
-                  <strong>{resultadoReserva.estado_reservacion}</strong>
-                </div>
-
-                <div className="cotizacion-total">
-                  <span>Total</span>
-                  <strong>
-                    ₡{Number(resultadoReserva.total).toLocaleString('es-CR')}
-                  </strong>
-                </div>
               </div>
+            </form>
+          </section>
 
-              {resultadoReserva.estado_pago === 'Aprobado' ? (
-                <>
-                  <p className="cotizacion-aviso">
-                    Guarda tu código de confirmación. Lo necesitarás
-                    para consultar o modificar tu reservación.
-                  </p>
+        </>
+      )}
+      {/* DESTINOS */}
+      {(seccionActual === 'inicio' || seccionActual === 'destinos') && (
+        <section className="destinos-seccion" id="destinos">
+          <div className="seccion-encabezado">
+            <span className="seccion-etiqueta">
+              EXPERIENCIAS INOLVIDABLES
+            </span>
 
-                  <div className="codigo-confirmacion">
-                    {resultadoReserva.codigo_confirmacion}
+            <h2>
+              {busquedaRealizada
+                ? 'Experiencias disponibles para tu viaje'
+                : 'Destinos que te enamorarán'}
+            </h2>
+
+            <p>
+              {busquedaRealizada
+                ? `Resultados para ${personas} persona(s) el ${fecha}`
+                : 'Descubre algunos de los lugares más hermosos de Costa Rica.'}
+            </p>
+          </div>
+
+          <div className="destinos-grid">
+
+            {cargando && (
+              <p>Cargando destinos turísticos...</p>
+            )}
+
+            {errorDestinos && (
+              <p>{errorDestinos}</p>
+            )}
+
+            {!cargando && !errorDestinos && destinos.length === 0 && (
+              <p>No hay destinos disponibles en este momento.</p>
+            )}
+
+            {!cargando && !errorDestinos && destinos.map((destino) => (
+              <article className="destino-card" key={destino.id}>
+
+                <div
+                  className={`destino-imagen ${destino.nombre.includes('Arenal')
+                    ? 'destino-arenal'
+                    : destino.nombre.includes('Manuel Antonio')
+                      ? 'destino-manuel'
+                      : destino.nombre.includes('Monteverde')
+                        ? 'destino-monteverde'
+                        : ''
+                    }`}
+                  style={
+                    destino.imagen_url
+                      ? { backgroundImage: `url("${destino.imagen_url}")` }
+                      : undefined
+                  }
+                >
+                  <span className="destino-badge">
+                    Costa Rica
+                  </span>
+                </div>
+
+                <div className="destino-info">
+
+                  <span className="destino-ubicacion">
+                    📍 {destino.ubicacion}
+                  </span>
+
+                  <h3>{destino.nombre}</h3>
+
+                  <p>{destino.descripcion}</p>
+                  <div className="destino-disponibilidad">
+                    <span className="destino-disponibilidad-punto"></span>
+
+                    <span>
+                      {destino.espacios_disponibles != null
+  ? `${destino.espacios_disponibles} cupos disponibles para ${
+      (busquedaRealizada ? fecha : fechaDisponibilidad)
+        .split('-')
+        .reverse()
+        .join('/')
+    }`
+  : 'Consulta la disponibilidad seleccionando una fecha'}
+                    </span>
                   </div>
-                </>
-              ) : (
-                <p className="cotizacion-aviso">
-                  Tu pago simulado fue rechazado y la reservación
-                  no quedó confirmada. No se ocuparon espacios.
-                </p>
-              )}
 
-              <button
-                className="boton-confirmar-cotizacion"
-                onClick={() => {
-                  setResultadoReserva(null);
-                  setCotizacion(null);
-                  setErrorReserva('');
-                }}
+                  <div className="destino-precio">
+                    <span className="destino-precio-etiqueta">
+                      DESDE
+                    </span>
+
+                    <div className="destino-precio-fila">
+                      <strong>
+                        ₡{Number(destino.precio_base).toLocaleString('es-CR')}
+                      </strong>
+
+                      <span> / por persona</span>
+                    </div>
+                  </div>
+
+                  <button
+                    className="boton-destino"
+                    onClick={() => cotizarDestino(destino)}
+                    disabled={cotizando}
+                  >
+                    {cotizando ? 'Calculando...' : 'Ver experiencia →'}
+                  </button>
+                </div>
+
+              </article>
+            ))}
+
+          </div>
+          {errorCotizacion && (
+            <div className="cotizacion-error">
+              <p>{errorCotizacion}</p>
+              <button onClick={cerrarCotizacion}>Cerrar</button>
+            </div>
+          )}
+
+          {cotizacion && !mostrarFormularioReserva && !resultadoReserva && (
+            <div className="modal-fondo" onClick={cerrarCotizacion}>
+              <div
+                className="modal-cotizacion"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="titulo-cotizacion"
+                onClick={(evento) => evento.stopPropagation()}
               >
-                Cerrar
-              </button>
+                <button
+                  className="modal-cerrar"
+                  onClick={cerrarCotizacion}
+                  aria-label="Cerrar cotización"
+                >
+                  ×
+                </button>
+
+                <span className="seccion-etiqueta">
+                  TU PRÓXIMA AVENTURA
+                </span>
+
+                <h2 id="titulo-cotizacion">Cotización de tu experiencia</h2>
+
+                <h3>{cotizacion.destino}</h3>
+
+                <div className="cotizacion-detalles">
+                  <div>
+                    <span>Personas</span>
+                    <strong>{cotizacion.personas}</strong>
+                  </div>
+
+                  <div>
+                    <span>Precio por persona</span>
+                    <strong>
+                      ₡{Number(cotizacion.precio_unitario).toLocaleString('es-CR')}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Subtotal</span>
+                    <strong>
+                      ₡{Number(cotizacion.subtotal).toLocaleString('es-CR')}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>IVA (13 %)</span>
+                    <strong>
+                      ₡{Number(cotizacion.iva).toLocaleString('es-CR')}
+                    </strong>
+                  </div>
+
+                  <div className="cotizacion-total">
+                    <span>Total</span>
+                    <strong>
+                      ₡{Number(cotizacion.total).toLocaleString('es-CR')}
+                    </strong>
+                  </div>
+                </div>
+
+                <p className="cotizacion-aviso">
+                  Esta cotización es informativa y todavía no constituye una reservación.
+                </p>
+
+                <button
+                  className="boton-confirmar-cotizacion"
+                  onClick={abrirFormularioReserva}
+                >
+                  Continuar con la reservación →
+                </button>
+              </div>
+            </div>
+          )}
+          {mostrarFormularioReserva && cotizacion && (
+            <div className="modal-fondo">
+              <div
+                className="modal-cotizacion"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="titulo-reserva"
+              >
+                <button
+                  type="button"
+                  className="modal-cerrar"
+                  onClick={() => setMostrarFormularioReserva(false)}
+                  aria-label="Cerrar formulario"
+                >
+                  ×
+                </button>
+
+                <span className="seccion-etiqueta">
+                  ESTÁS A UN PASO DE TU AVENTURA
+                </span>
+
+                <h2 id="titulo-reserva">Datos de tu reservación</h2>
+
+                <h3>{cotizacion.destino}</h3>
+
+                <form
+                  className="formulario-reserva"
+                  onSubmit={confirmarReservacion}
+                >
+                  <label htmlFor="reserva-nombre">
+                    Nombre completo
+                  </label>
+                  <input
+                    id="reserva-nombre"
+                    type="text"
+                    value={datosReserva.nombre}
+                    onChange={(evento) =>
+                      setDatosReserva({
+                        ...datosReserva,
+                        nombre: evento.target.value
+                      })
+                    }
+                    placeholder="Escribe tu nombre completo"
+                    required
+                  />
+
+                  <label htmlFor="reserva-correo">
+                    Correo electrónico
+                  </label>
+                  <input
+                    id="reserva-correo"
+                    type="email"
+                    value={datosReserva.correo}
+                    onChange={(evento) =>
+                      setDatosReserva({
+                        ...datosReserva,
+                        correo: evento.target.value
+                      })
+                    }
+                    placeholder="ejemplo@correo.com"
+                    required
+                  />
+
+                  <label htmlFor="reserva-fecha">
+                    Fecha de la excursión
+                  </label>
+                  <input
+                    id="reserva-fecha"
+                    type="date"
+                    value={datosReserva.fecha}
+                    min={new Date().toLocaleDateString('en-CA')}
+                    onChange={(evento) =>
+                      setDatosReserva({
+                        ...datosReserva,
+                        fecha: evento.target.value
+                      })
+                    }
+                    required
+                  />
+
+                  <label htmlFor="reserva-hora">
+                    Hora de la excursión
+                  </label>
+                  <input
+                    id="reserva-hora"
+                    type="time"
+                    value={datosReserva.hora}
+                    onChange={(evento) =>
+                      setDatosReserva({
+                        ...datosReserva,
+                        hora: evento.target.value
+                      })
+                    }
+                    required
+                  />
+
+                  <label htmlFor="reserva-tarjeta">
+                    Número de tarjeta (pago simulado)
+                  </label>
+                  <input
+                    id="reserva-tarjeta"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    placeholder="0000 0000 0000 0000"
+                    value={datosReserva.numeroTarjeta.replace(/(\d{4})(?=\d)/g, '$1 ')}
+                    onChange={(evento) => {
+                      const numero = evento.target.value
+                        .replace(/\D/g, '')
+                        .slice(0, 16);
+
+                      setDatosReserva({
+                        ...datosReserva,
+                        numeroTarjeta: numero
+                      });
+                    }}
+                    minLength={16}
+                    maxLength={19}
+                    pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+                    title="Introduce exactamente 16 dígitos de una tarjeta ficticia"
+                    required
+                  />
+                  <div className="reserva-resumen">
+                    <p>
+                      <strong>Personas:</strong> {cotizacion.personas}
+                    </p>
+
+                    <p>
+                      <strong>Total con IVA:</strong>{' '}
+                      ₡{Number(cotizacion.total).toLocaleString('es-CR')}
+                    </p>
+                  </div>
+
+                  {errorReserva && (
+                    <p role="alert" style={{ color: '#b91c1c' }}>
+                      {errorReserva}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="boton-confirmar-cotizacion"
+                    disabled={procesandoReserva}
+                  >
+                    {procesandoReserva
+                      ? 'Procesando reservación...'
+                      : 'Confirmar reservación →'}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+          {resultadoReserva && (
+            <div className="modal-fondo">
+              <div
+                className="modal-cotizacion"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="titulo-resultado-reserva"
+              >
+                <span className="seccion-etiqueta">
+                  VIAJAYA
+                </span>
+
+                <h2 id="titulo-resultado-reserva">
+                  {resultadoReserva.estado_pago === 'Aprobado'
+                    ? '¡Reservación confirmada!'
+                    : 'Pago rechazado'}
+                </h2>
+
+                <h3>{resultadoReserva.destino}</h3>
+
+                <div className="cotizacion-detalles">
+                  <div>
+                    <span>Fecha</span>
+                    <strong>{resultadoReserva.fecha}</strong>
+                  </div>
+
+                  <div>
+                    <span>Hora</span>
+                    <strong>{resultadoReserva.hora}</strong>
+                  </div>
+
+                  <div>
+                    <span>Personas</span>
+                    <strong>{resultadoReserva.personas}</strong>
+                  </div>
+
+                  <div>
+                    <span>Estado del pago</span>
+                    <strong>{resultadoReserva.estado_pago}</strong>
+                  </div>
+
+                  <div>
+                    <span>Estado de la reservación</span>
+                    <strong>{resultadoReserva.estado_reservacion}</strong>
+                  </div>
+
+                  <div className="cotizacion-total">
+                    <span>Total</span>
+                    <strong>
+                      ₡{Number(resultadoReserva.total).toLocaleString('es-CR')}
+                    </strong>
+                  </div>
+                </div>
+
+                {resultadoReserva.estado_pago === 'Aprobado' ? (
+                  <>
+                    <p className="cotizacion-aviso">
+                      Guarda tu código de confirmación. Lo necesitarás
+                      para consultar o modificar tu reservación.
+                    </p>
+
+                    <div className="codigo-confirmacion">
+                      {resultadoReserva.codigo_confirmacion}
+                    </div>
+                  </>
+                ) : (
+                  <p className="cotizacion-aviso">
+                    Tu pago simulado fue rechazado y la reservación
+                    no quedó confirmada. No se ocuparon espacios.
+                  </p>
+                )}
+
+                <button
+                  className="boton-confirmar-cotizacion"
+                  onClick={() => {
+                    setResultadoReserva(null);
+                    setCotizacion(null);
+                    setErrorReserva('');
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+      {/* SOBRE NOSOTROS */}
+      {seccionActual === 'nosotros' && (
+        <section className="nosotros" id="nosotros">
+          <span className="seccion-etiqueta">CONOCE VIAJAYA</span>
+
+          <h2>Experiencias que se convierten en recuerdos</h2>
+
+          <p className="nosotros-introduccion">
+            En ViajaYa creemos que cada viaje es una oportunidad
+            para descubrir nuevos lugares, conectar con la naturaleza
+            y crear recuerdos inolvidables.
+          </p>
+
+          <p className="nosotros-introduccion">
+            Somos una plataforma digital de turismo enfocada en
+            facilitar la búsqueda, cotización y reservación de
+            experiencias turísticas en Costa Rica, ofreciendo
+            una manera sencilla y organizada de planificar aventuras.
+          </p>
+
+          <div className="nosotros-contenido">
+            <div className="nosotros-tarjeta">
+
+              <h3>Nuestra misión</h3>
+              <p>
+                Facilitar el acceso a experiencias turísticas en
+                Costa Rica mediante una plataforma digital intuitiva,
+                que permita explorar destinos y realizar reservaciones
+                de forma práctica y confiable.
+              </p>
+            </div>
+
+            <div className="nosotros-tarjeta">
+              <h3>Nuestra visión</h3>
+              <p>
+                Ser una plataforma turística reconocida por conectar
+                a las personas con la riqueza natural y cultural
+                de Costa Rica, promoviendo experiencias memorables
+                y el uso de soluciones digitales innovadoras.
+              </p>
+            </div>
+
+            <div className="nosotros-tarjeta">
+              <h3>¿Por qué elegir ViajaYa?</h3>
+              <p>
+                Porque reunimos destinos turísticos, información
+                de precios, disponibilidad y opciones de reservación
+                en un solo lugar, haciendo más sencilla la
+                planificación de cada aventura.
+              </p>
             </div>
           </div>
-        )}
-      </section>
-
-      {/* SOBRE NOSOTROS */}
-      <section className="nosotros" id="nosotros">
-        <span className="seccion-etiqueta">VIAJA CON NOSOTROS</span>
-
-        <h2>Experiencias que se convierten en recuerdos</h2>
-
-        <p>
-          En ViajaYa queremos ayudarte a descubrir
-          la belleza de Costa Rica y disfrutar cada aventura.
-        </p>
-      </section>
-
+        </section>
+      )}
       {/* PIE DE PÁGINA */}
       <footer className="footer">
         <div className="footer-contenido">
