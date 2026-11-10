@@ -1999,7 +1999,7 @@ function App() {
           <div className="modal-cotizacion panel-admin-amplio">
             <button type="button" className="modal-cerrar" aria-label="Cerrar panel" onClick={() => setMostrarPanelAdmin(false)}>×</button>
             <div className="vy-admin-cabecera">
-              <span className="vy-admin-simbolo">▥</span>
+              <span className="vy-admin-simbolo"></span>
               <div>
                 <h2>Panel de administración</h2>
                 <p>¡Bienvenido al panel administrativo de ViajaYa!</p>
@@ -2321,17 +2321,18 @@ function App() {
                       >
                         Editar destino
                       </button>
-
                       <button
                         type="button"
-                        className="boton-confirmar-cotizacion"
+                        className={`boton-confirmar-cotizacion ${destino.activo
+                            ? 'boton-desactivar-destino'
+                            : 'boton-activar-destino'
+                          }`}
                         onClick={() => cambiarEstadoDestino(destino)}
                       >
                         {destino.activo
-                          ? '🔴 Desactivar destino'
-                          : '🟢 Activar destino'}
+                          ? 'Desactivar destino'
+                          : 'Activar destino'}
                       </button>
-
 
                     </div>
                   ))}
@@ -2373,7 +2374,7 @@ function App() {
                       key={reservacion.id}
                       className="tarjeta-destino-admin"
                     >
-                      <h4>🎫 {reservacion.codigo_confirmacion}</h4>
+                      <h4> {reservacion.codigo_confirmacion}</h4>
 
                       <p>
                         <strong>Cliente:</strong> {reservacion.nombre_cliente}
@@ -2495,7 +2496,7 @@ function App() {
                     key={pago.id}
                     className="tarjeta-destino-admin"
                   >
-                    <h4>💳 Pago #{pago.id}</h4>
+                    <h4>Pago #{pago.id}</h4>
 
                     <p>
                       <strong>Reservación:</strong>{' '}

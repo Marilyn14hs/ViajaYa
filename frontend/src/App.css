@@ -2822,3 +2822,33 @@ body {
   margin: 0;
   align-self: end;
 }
+
+/* Botón para desactivar destinos */
+.boton-desactivar-destino {
+  background-color: #fff1f0;
+  color: #c62828;
+  border: 1px solid #e57373;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.boton-desactivar-destino:hover {
+  background-color: #c62828;
+  color: #ffffff;
+  border-color: #c62828;
+}
+
+/* Botón para activar destinos */
+.boton-activar-destino {
+  background-color: #e8f5e9;
+  color: #167a43;
+  border: 1px solid #66bb6a;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.boton-activar-destino:hover {
+  background-color: #167a43;
+  color: #ffffff;
+  border-color: #167a43;
+}

@@ -370,12 +370,12 @@ app.patch('/api/reservaciones/cancelar', async (req, res) => {
 });
 // Limitar los intentos de inicio de sesión
 const limitarIntentosAdmin = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 2 * 60 * 1000,
     limit: 5,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     message: {
-        mensaje: 'Demasiados intentos. Intenta nuevamente en 15 minutos'
+        mensaje: 'Demasiados intentos. Intenta nuevamente en 2 minutos'
     }
 });
 
