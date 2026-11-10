@@ -1228,13 +1228,12 @@ function App() {
 
                     <span>
                       {destino.espacios_disponibles != null
-  ? `${destino.espacios_disponibles} cupos disponibles para ${
-      (busquedaRealizada ? fecha : fechaDisponibilidad)
-        .split('-')
-        .reverse()
-        .join('/')
-    }`
-  : 'Consulta la disponibilidad seleccionando una fecha'}
+                        ? `${destino.espacios_disponibles} cupos disponibles para ${(busquedaRealizada ? fecha : fechaDisponibilidad)
+                          .split('-')
+                          .reverse()
+                          .join('/')
+                        }`
+                        : 'Consulta la disponibilidad seleccionando una fecha'}
                     </span>
                   </div>
 
@@ -1660,7 +1659,7 @@ function App() {
             aria-labelledby="titulo-consulta"
           >
             <button type="button" className="modal-cerrar" aria-label="Cerrar" onClick={() => { setMostrarConsulta(false); setReservaConsultada(null); }}>×</button>
-            <div className="vy-modal-icono" aria-hidden="true">🗓️</div>
+            <div className="vy-modal-icono" aria-hidden="true"></div>
             <span className="seccion-etiqueta">
               VIAJAYA
             </span>
@@ -1913,7 +1912,7 @@ function App() {
         <div className="modal-fondo">
           <div className="modal-cotizacion vy-modal-login">
             <button type="button" className="modal-cerrar" aria-label="Cerrar" onClick={() => setMostrarLoginAdmin(false)}>×</button>
-            <div className="vy-modal-icono" aria-hidden="true">⚙️</div>
+            <div className="vy-modal-icono" aria-hidden="true"></div>
             <h2>Administración de ViajaYa</h2>
 
             <p>

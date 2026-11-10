@@ -2768,7 +2768,9 @@ body {
 .navbar .menu,
 .navbar .navbar-acciones {
   gap: 10px;
-}/* Alineación uniforme de tarjetas */
+}
+
+/* Alineación uniforme de tarjetas */
 .destinos-grid {
   align-items: stretch;
 }
@@ -2782,12 +2784,7 @@ body {
 .destino-info {
   display: grid;
   grid-template-rows:
-    auto
-    minmax(55px, auto)
-    minmax(140px, 1fr)
-    auto
-    auto
-    auto;
+    auto minmax(55px, auto) minmax(140px, 1fr) auto auto auto;
   gap: 14px;
   flex: 1;
   padding: 24px;
@@ -2799,7 +2796,7 @@ body {
 }
 
 /* Descripción: mismo espacio visual */
-.destino-info > p {
+.destino-info>p {
   margin: 0;
   line-height: 1.65;
   display: -webkit-box;
