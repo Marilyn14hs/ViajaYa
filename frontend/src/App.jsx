@@ -1130,17 +1130,17 @@ function App() {
 
                 <div className="campo">
                   <label htmlFor="personas">Personas</label>
-                  <select
+
+                  <input
+                    type="number"
                     id="personas"
+                    min="1"
+                    step="1"
                     value={personas}
-                    onChange={(e) => setPersonas(Number(e.target.value))}
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((numero) => (
-                      <option key={numero} value={numero}>
-                        {numero} {numero === 1 ? 'persona' : 'personas'}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(e) => setPersonas(e.target.value)}
+                    required
+                  />
+
                 </div>
 
                 <button
@@ -2324,8 +2324,8 @@ function App() {
                       <button
                         type="button"
                         className={`boton-confirmar-cotizacion ${destino.activo
-                            ? 'boton-desactivar-destino'
-                            : 'boton-activar-destino'
+                          ? 'boton-desactivar-destino'
+                          : 'boton-activar-destino'
                           }`}
                         onClick={() => cambiarEstadoDestino(destino)}
                       >
